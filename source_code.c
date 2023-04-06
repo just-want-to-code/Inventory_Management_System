@@ -8,12 +8,12 @@ int no_items[1000]={0};
 int cost_items[1000]= {0};
 sem_t s;
 int totexp=0,totinc=0;
-void *produce(int id)
+void *produce(void* id)
 {
     int x,t,choice=1;
     sem_wait(&s);
     int sum=0;
-    printf("Producer id: %d\n",id);
+    printf("Producer id: %d\n",*((int *)id));
     while(choice==1)
     {
         printf("Enter id of item to produce: ");
@@ -39,17 +39,18 @@ void *produce(int id)
     printf("Inventory expenditure: Rs%d\n", sum);
     totexp+=sum;
     printf("Number of items of each type in inventory: \n");
-    for( int i=0;i<num_of_items;i++){
+    int i=0;
+    for(i=0;i<num_of_items;i++){
         printf("id %d = %d \n",i,no_items[i]);
     }
     printf("\n");
     sem_post(&s);
 }
-void *consume(int id)
+void *consume(void* id)
 {
     int y,t,choice=1,sum=0;
     sem_wait(&s);
-    printf("Consumer id: %d\n",id);
+    printf("Consumer id: %d\n",*((int *)id));
     while(choice==1)
     {
         printf("Enter id of item to consume: ");
@@ -83,7 +84,8 @@ void *consume(int id)
     printf("Inventory income: Rs%d\n",sum);
     totinc+=sum;
     printf("Number of items of each type in inventory: \n");
-    for( int i=0;i<num_of_items;i++){
+    int i=0;
+    for(i=0;i<num_of_items;i++){
       printf("id %d = %d \n",i,no_items[i]);
     }
     printf("\n");
@@ -98,9 +100,10 @@ int main()
     printf("Enter number of types of items to be available for marketing: ");
     scanf("%d",&num_of_items);
     printf("Set unit price of each type of item: ");
-    for(int i=0; i<num_of_items; i++) scanf("%d",&cost_items[i]);
+    int i=0;
+    for(i=0; i<num_of_items; i++) scanf("%d",&cost_items[i]);
 
-    int no_prod=0,no_cons;
+    int no_prod=0,no_cons=0;
     printf("Enter number of producers: ");
     scanf("%d",&no_prod);
     printf("Enter number of consumers: ");
@@ -108,27 +111,28 @@ int main()
 
     pthread_t consumer[no_cons], producer[no_prod];
     int m= 0,n= 0;
-    printf("\n");
+    printf("\n\n");
 
 
     printf("Items with their ids in inventory: \n");
-    for(int i=0;i<num_of_items;i++){
+    for(i=0;i<num_of_items;i++){
         printf("id %d = %d \tcost = Rs%d\n",i,no_items[i],cost_items[i]);
     }
-    printf("\n");
-    pthread_create(&producer[0], NULL, produce, NULL);
+   pthread_create(&producer[0], NULL, produce, &m);
     m++;
+    printf("\n");
+   
 
     while(m<no_prod || n<no_cons)
     {
         if(m==no_prod)
         {
-            pthread_create(&consumer[n], NULL, consume, n);
+            pthread_create(&consumer[n], NULL, consume, &n);
             n++;
         }
         else if (n==no_cons)
         {
-            pthread_create(&producer[m], NULL, produce, m);
+            pthread_create(&producer[m], NULL, produce, &m);
             m++;
         }
         else
@@ -136,22 +140,22 @@ int main()
             int choice= rand()%2;
             if(choice==0)
             {
-                pthread_create(&producer[m], NULL, produce, m);
+                pthread_create(&producer[m], NULL, produce, &m);
                 m++;
             }
             else
             {
-                pthread_create(&consumer[n], NULL, consume, n);
+                pthread_create(&consumer[n], NULL, consume, &n);
                 n++;
             }
         }
     }
 
-    for(int i=0; i<no_prod; i++) pthread_join(producer[i], NULL);
-    for(int i=0; i<no_cons; i++) pthread_join(consumer[i], NULL);
+    for(i=0; i<no_prod; i++) pthread_join(producer[i], NULL);
+    for(i=0; i<no_cons; i++) pthread_join(consumer[i], NULL);
 
     printf("Final list of items in the inventory: \n");
-    for(int i=0; i<num_of_items; i++)
+    for(i=0; i<num_of_items; i++)
     {
         printf("id %d = %d \n",i,no_items[i]);
     }
