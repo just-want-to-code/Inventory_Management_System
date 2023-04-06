@@ -106,7 +106,7 @@ int main()
     printf("Enter number of consumers: ");
     scanf("%d",&no_cons);
 
-    pthread_t consumer[no_prod], producer[no_cons];
+    pthread_t consumer[no_cons], producer[no_prod];
     int m= 0,n= 0;
     printf("\n");
 
