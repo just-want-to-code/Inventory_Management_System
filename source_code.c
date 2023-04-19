@@ -121,13 +121,14 @@ int main()
    pthread_create(&producer[0], NULL, produce, &m);
     m++;
     printf("\n");
-   
+
 
     while(m<no_prod || n<no_cons)
     {
         if(m==no_prod)
         {
             pthread_create(&consumer[n], NULL, consume, &n);
+            pthread_join(producer[0], NULL);
             n++;
         }
         else if (n==no_cons)
@@ -151,7 +152,7 @@ int main()
         }
     }
 
-    for(i=0; i<no_prod; i++) pthread_join(producer[i], NULL);
+    for(i=1; i<no_prod; i++) pthread_join(producer[i], NULL);
     for(i=0; i<no_cons; i++) pthread_join(consumer[i], NULL);
 
     printf("Final list of items in the inventory: \n");
