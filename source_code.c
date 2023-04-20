@@ -14,7 +14,7 @@ void *produce(void* id)
     sem_wait(&s);
     int sum=0;
     printf("Producer id: %d\n",rand()%100);
-    printf("\n");
+    //printf("\n");
     while(choice==1)
     {
         printf("Enter id of item to produce: ");
